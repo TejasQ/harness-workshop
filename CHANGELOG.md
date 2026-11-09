@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 8: rent the loop
+
+**Changed:** a new `managed.ts` exports a `runAgent` with the same shape as the one in `agent.ts`, but Claude Managed Agents runs the loop. On the first line it creates an agent (our system prompt, with each of our tools as a custom tool), a cloud environment and a session. Each line after that is one `user.message` event: the session holds the history, and caching and compaction happen on Anthropic's side. When the agent asks for one of our tools, an `agent.custom_tool_use` event arrives, `runTool` runs it here, gate and all, and a `user.custom_tool_result` goes back. The caps still hold: past them, it sends `user.interrupt`. `cost()` takes just the four token counts, so it prices the session's usage too. `harness.ts` imports `runAgent` from `managed.ts` and passes the agent without the lead.
+
+**Prompt:**
+
+> Add `managed.ts` with a `runAgent(history, agent)` like the one in `agent.ts`, built on Claude Managed Agents (`client.beta.agents`, `environments` and `sessions`). On the first call, create an agent with `MODEL`, the agent's system prompt and each of its tools as a `custom` tool, a `cloud` environment with `limited` networking, and a session. On each call, open the event stream, send the newest line as a `user.message`, and follow the events: log `agent.message` text as `ai>`; run each `agent.custom_tool_use` with `runTool` and send back a `user.custom_tool_result`, with `is_error` on a throw; count `span.model_request_end` usage with `cost()` and send `user.interrupt` past the caps; return on `session.status_idle` unless its stop reason is `requires_action`. In `harness.ts`, import `runAgent` from `managed.ts` and drop the lead.
+
+**Try:** "Open Hacker News and give me the top three titles." Then "My name is Ada." and "What's my name?": only the newest line goes up, and it still knows.
+
+**Why:** steps 0 to 4 are what you rent: the loop, the history, caching and compaction. Look at what didn't change: `browser.ts`, `tools.ts` and `guardrails.ts`. The domain, the gate and the caps are still yours, and so is the checkpoint, since `ask_person` and Take the wheel run on this laptop. AWS's AgentCore harness and Cloudflare's Think sell the same layer in other shapes.
+
 ## 7: a new domain
 
 **Changed:** a new `browser.ts` sits next to `coding.ts` and exports the same two things: `SYSTEM` and `TOOLS`. Its tools are a real browser, logged in to the person's sites, reached over HTTPS with a Daiku script key, plus two checkpoints that belong to the harness: `ask_person`, and `request_human`, which prints the Take the wheel link and waits for the person itself. `harness.ts` imports `browser.ts` instead of `coding.ts`. Tool inputs may be any JSON now, not only strings. The loop, caps, gate and phases are unchanged.

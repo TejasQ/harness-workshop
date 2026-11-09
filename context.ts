@@ -27,7 +27,7 @@ const PRICE = LOCAL ? { input: 0, cacheWrite: 0, cacheRead: 0, output: 0 } : { i
 let spent = 0;
 
 // Print what one call cost, and return the tokens it used for the budget.
-export function cost(usage: Anthropic.Beta.BetaUsage, log: (line: string) => void) {
+export function cost(usage: Pick<Anthropic.Beta.BetaUsage, "input_tokens" | "output_tokens" | "cache_creation_input_tokens" | "cache_read_input_tokens">, log: (line: string) => void) {
   const prompt = usage.input_tokens + (usage.cache_creation_input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0);
   const step = prompt > 100_000 ? 5 : 1;
   const dollars =

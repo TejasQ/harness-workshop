@@ -1,11 +1,12 @@
-// The terminal. Read a line, hand it to the agent, repeat. The agent itself lives in agent.ts.
-// The model remembers nothing. This array is the whole memory, and the harness owns it.
-import { runAgent, type History } from "./agent.ts";
+// The terminal. Read a line, hand it to the agent, repeat. The agent itself lives in agent.ts, or
+// rent it: managed.ts runs the same tools on Claude Managed Agents. Swap the import to compare.
+import type { History } from "./agent.ts";
 import { SYSTEM, TOOLS } from "./browser.ts"; // or ./coding.ts: the same loop, another domain
-import { lead } from "./phases.ts";
+import { runAgent } from "./managed.ts"; // or ./agent.ts: our own loop, on this laptop
 import { log, prompt } from "./terminal.ts";
 
-const agent = lead(SYSTEM, TOOLS, log);
+// No lead here: Managed Agents has its own way to split a job, so the phases stay in step 5.
+const agent = { system: SYSTEM, tools: TOOLS, log };
 const messages: History = [];
 
 while (true) {
