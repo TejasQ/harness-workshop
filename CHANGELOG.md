@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 4: context
+
+**Changed:** a new `context.ts`: prompt caching and server compaction before 90k tokens (`CONTEXT`), tool results cut where they are made (`fit`), and the cost of every call printed (`cost`). `coding.ts` gets a stable `SYSTEM` prompt. `agent.ts` moves to `client.beta.messages.create` and spreads in `CONTEXT`.
+
+**Prompt:**
+
+> Add context management in a new `context.ts`. Export `CONTEXT`: top-level `cache_control: { type: "ephemeral" }`, `betas: ["compact-2026-01-12"]` and `context_management: { edits: [{ type: "compact_20260112", trigger: { type: "input_tokens", value: 90000 } }] }`. Export `fit(output)`, which cuts any tool result over 12,000 characters with a note on how to ask for less; `runTool` returns `fit(...)`. Export `cost(usage)`, which prints prompt tokens, cached tokens and dollars at Haiku 5.5 prices ($0.10 in, $0.125 cache write, $0.01 cache read, $0.50 out per million; 5x for the whole request over 100k prompt tokens) and returns the tokens for the budget. In `agent.ts`, move to `client.beta.messages.create`, send a short fixed `SYSTEM` prompt from `coding.ts`, spread in `CONTEXT`, and say when a `compaction` block comes back.
+
+**Try:** "Read every file here and summarise the project." Watch the cached count grow.
+
+**Why:** the prompt is resent on every step, so it is the bill. Cache what never changes, shrink what comes in, compact before the price step.
+
 ## 3: guardrails
 
 **Changed:** a new `guardrails.ts` with a `budget()` per task (`MAX_STEPS`, `MAX_TOKENS`) and a `gate()` that asks yes or no before `write_file`, `edit_file` and `bash`, with a `confirm()` from `terminal.ts`. `runAgent` checks the budget each step and says when a stop was `max_tokens` or `refusal`.

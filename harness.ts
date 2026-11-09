@@ -4,7 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { runAgent } from "./agent.ts";
 import { prompt } from "./terminal.ts";
 
-const messages: Anthropic.MessageParam[] = [];
+const messages: Anthropic.Beta.BetaMessageParam[] = [];
 
 while (true) {
   const line = await prompt();

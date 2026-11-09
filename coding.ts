@@ -3,6 +3,9 @@ import { execSync } from "node:child_process";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { tool, type Tool } from "./tools.ts";
 
+// Nothing here may change between calls, or the cache starts over.
+export const SYSTEM = "You are a coding agent working in the current folder. Read before you edit. Keep answers short.";
+
 export const TOOLS: Tool[] = [
   tool("read_file", "Read a text file, by its path relative to the project root.", { path: "Like src/index.ts" }, async ({ path }) => await readFile(path, "utf8")),
   tool("list_files", "List the files in a folder.", { path: "A folder, like . or src" }, async ({ path }) => (await readdir(path, { recursive: true })).filter((file) => !file.includes("node_modules")).join("\n")),
