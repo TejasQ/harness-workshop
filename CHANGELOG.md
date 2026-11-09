@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 7: a new domain
+
+**Changed:** a new `browser.ts` sits next to `coding.ts` and exports the same two things: `SYSTEM` and `TOOLS`. Its tools are a real browser, logged in to the person's sites, reached over HTTPS with a Daiku script key, plus two checkpoints that belong to the harness: `ask_person`, and `request_human`, which prints the Take the wheel link and waits for the person itself. `harness.ts` imports `browser.ts` instead of `coding.ts`. Tool inputs may be any JSON now, not only strings. The loop, caps, gate and phases are unchanged.
+
+**Prompt:**
+
+> Add a new domain in `browser.ts`, exporting `SYSTEM` and `TOOLS` like `coding.ts` does. Each tool POSTs its input as JSON to `https://daiku.ai/api/v1/tools/<name>` with `Authorization: Bearer $DAIKU_KEY`, returning `text` and throwing when `isError` is true: `workspace` (open with a name, or close), `navigate(url)`, `find(query)`, `read_text(ref)`, `extract(ref, rows, fields)`, `act(action, ref, description, text)`, `request_human(reason)` and `wait_for_approval(approval)`, each taking a `workspace` id. `request_human` gets a Take the wheel link the person opens to drive the browser themselves, for a login or a code: have the harness print that link itself with a `handOver()` in `terminal.ts`, and call Daiku's `wait_for_human` until it stops answering `still_waiting`, so the tool only returns once they hand the browser back. Add `ask_person(question)`, which asks me with an `ask()` in `terminal.ts`. Write the system prompt for errands in the person's own browser: open a workspace first, read before acting, ask the person before choices that change the result. Let tool inputs be any JSON, not only strings, but keep `tool()` handing its function strings. In `harness.ts`, import from `browser.ts` instead of `coding.ts`.
+
+**Try:** "Open Hacker News and give me the top three titles." Then an errand of your own.
+
+**Why:** a harness is domain-specific, and the domain is the registry plus the rules. Look at the diff: one import changed in `harness.ts`, and `agent.ts` didn't change at all. The gate moved too: none of these tools is on the y/N list, because Daiku asks the person on their phone before anything sends, pays or deletes.
+
 ## 6: any model
 
 **Changed:** a new `model.ts` decides the client from `MODEL`. A non-Claude model goes to Ollama's Anthropic-compatible endpoint on this laptop. `context.ts` leaves out the Claude-only caching and compaction for it, and prices it at $0.

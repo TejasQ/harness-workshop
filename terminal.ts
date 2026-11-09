@@ -40,3 +40,21 @@ export async function confirm(question: string) {
   spinner.start();
   return yes;
 }
+
+// A question from the agent, answered in words.
+export async function ask(question: string) {
+  spinner.stop();
+  const answer = await input({ message: question }).catch(() => process.exit(0));
+  spinner.start();
+  return answer;
+}
+
+// A step only the person can do in their browser: show them the link, and spin until they're done.
+export async function handOver(reason: string, link: string, done: () => Promise<string>) {
+  spinner.stop();
+  console.log(`\n${styleText("yellow", `${reason}:`)} ${styleText(["cyan", "underline"], link)}`);
+  spinner.start("your turn: press I'm done in Daiku when you've finished");
+  const answer = await done();
+  spinner.text = "thinking";
+  return answer;
+}
