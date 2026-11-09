@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 2: a tool registry
+
+**Changed:** `tools.ts` now says what a tool is: `{ definition, run }`, built by one `tool()` helper, and `runTool(tools, name, input)` finds one by name. The tools themselves move to a new `coding.ts`: `read_file`, `list_files`, `write_file`, `edit_file` and `bash`. The loop in `agent.ts` only changes where it gets its tools.
+
+**Prompt:**
+
+> Make the tools a registry. In `tools.ts`, define `type Tool = { definition: Anthropic.Tool; run: (input) => Promise<string> }`, a helper `tool(name, description, fields, run)` that builds the JSON schema from `{ field: description }` with every field a required string, and `runTool(tools, name, input)` that finds the tool by name and runs it. Make a new `coding.ts` that exports `TOOLS`: `read_file(path)`, `list_files(path)` (recursive, skip node_modules), `write_file(path, content)`, `edit_file(path, old, new)` (old must appear exactly once) and `bash(command)`. Have `agent.ts` send `TOOLS`' definitions and run them with `runTool`.
+
+**Try:** "Add hello.ts that prints today's date, then run it."
+
+**Why:** the tool list is the domain. Five tools make a coding agent, and the descriptions are prompts: the model only knows what those strings say.
+
 ## 1: one tool
 
 **Changed:** the model call moves out of `harness.ts` into `runAgent(messages)` in a new `agent.ts`, and becomes a loop that runs while `stop_reason` is `tool_use`. A new `tools.ts` holds `read_file` and `runTool(name, input)`. `runTools` gives every call exactly one `tool_result`, all in one user message, errors as `is_error`. `harness.ts` is now only the terminal loop, and a new `terminal.ts` is how it looks: an inquirer prompt, colours, and an ora spinner while it waits.
