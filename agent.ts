@@ -3,10 +3,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { CONTEXT, cost } from "./context.ts";
 import { budget } from "./guardrails.ts";
+import { client, MODEL } from "./model.ts";
 import { runTool, type Input, type Tool } from "./tools.ts";
-
-const client = new Anthropic();
-const MODEL = process.env.MODEL ?? "claude-haiku-5-5";
 
 // The same loop runs any agent: the lead, or a phase. Only these change.
 export type Agent = { system: string; tools: Tool[]; log: (line: string) => void };

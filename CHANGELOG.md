@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 6: any model
+
+**Changed:** a new `model.ts` decides the client from `MODEL`. A non-Claude model goes to Ollama's Anthropic-compatible endpoint on this laptop. `context.ts` leaves out the Claude-only caching and compaction for it, and prices it at $0.
+
+**Prompt:**
+
+> Make the model swappable. Move the client and `MODEL` out of `agent.ts` into a new `model.ts`. If `MODEL` doesn't start with `claude`, export `LOCAL = true` and create the client with `baseURL` `http://localhost:11434` (or `OLLAMA_URL`) and `apiKey: "ollama"`. In `context.ts`, make `CONTEXT` empty when `LOCAL`, since `cache_control`, `betas` and `context_management` only exist on Claude's API, and price local calls at zero.
+
+**Try:** `ollama pull granite4:tiny-h`, then `MODEL=granite4:tiny-h pnpm start` and repeat a step 5 job.
+
+**Why:** IBM Granite runs the same loop, tools, gates and phases. The harness carries more of the result than the model does.
+
 ## 5: phases
 
 **Changed:** `runAgent(history, agent)` now takes an `Agent`: its system prompt, its tools and how it prints. A new `phases.ts` builds the `lead` agent, which gets one more tool, `run_phase(brief)`: it runs the same `runAgent` in a fresh, empty history and returns only a short note.
