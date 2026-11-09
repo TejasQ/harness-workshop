@@ -1,6 +1,6 @@
 // The terminal: how the harness looks. Prompts, colours and a spinner all live in this one file, so
 // the files that teach the agent stay plain text.
-import { input } from "@inquirer/prompts";
+import { input, confirm as yesNo } from "@inquirer/prompts";
 import { styleText } from "node:util";
 import ora from "ora";
 
@@ -31,4 +31,12 @@ function paint(part: string) {
     : mark.startsWith("!") ? styleText("red", text)
     : text;
   return styleText("dim", bar) + look;
+}
+
+// A yes or no from the person, for the gate.
+export async function confirm(question: string) {
+  spinner.stop();
+  const yes = await yesNo({ message: question, default: false }).catch(() => process.exit(0));
+  spinner.start();
+  return yes;
 }

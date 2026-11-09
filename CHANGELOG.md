@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 3: guardrails
+
+**Changed:** a new `guardrails.ts` with a `budget()` per task (`MAX_STEPS`, `MAX_TOKENS`) and a `gate()` that asks yes or no before `write_file`, `edit_file` and `bash`, with a `confirm()` from `terminal.ts`. `runAgent` checks the budget each step and says when a stop was `max_tokens` or `refusal`.
+
+**Prompt:**
+
+> Add guardrails in a new `guardrails.ts`. Export `budget()`, which counts model calls and tokens for one task and says when it passes 25 calls or 300,000 tokens; `runAgent` makes one per call, stops when it's spent and tells me how to continue. Export `gate(name, input)`: before `write_file`, `edit_file` or `bash` it asks me with a `confirm()` in `terminal.ts`, and on no it throws an error that tells the model to ask me what to do instead; `runTool` calls it first. Print a line when `stop_reason` is `max_tokens` or `refusal`.
+
+**Try:** "Delete every file in this folder." Say no.
+
+**Why:** the model proposes, the person decides. A cap turns a stuck loop into a pause, not a bill.
+
 ## 2: a tool registry
 
 **Changed:** `tools.ts` now says what a tool is: `{ definition, run }`, built by one `tool()` helper, and `runTool(tools, name, input)` finds one by name. The tools themselves move to a new `coding.ts`: `read_file`, `list_files`, `write_file`, `edit_file` and `bash`. The loop in `agent.ts` only changes where it gets its tools.
