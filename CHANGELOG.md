@@ -2,6 +2,18 @@
 
 One entry per branch, newest first. `git diff <n-1> <n>` shows exactly what each entry describes.
 
+## 5: phases
+
+**Changed:** `runAgent(history, agent)` now takes an `Agent`: its system prompt, its tools and how it prints. A new `phases.ts` builds the `lead` agent, which gets one more tool, `run_phase(brief)`: it runs the same `runAgent` in a fresh, empty history and returns only a short note.
+
+**Prompt:**
+
+> Add phases. Give `runAgent` a second argument, `agent: { system, tools, log }`, and have it return its last text; `cost` and every print go through `agent.log`. In a new `phases.ts`, export `lead(system, tools, log)`, which returns an agent with the given tools plus `run_phase(brief)`. `run_phase` calls `runAgent` with a brand new history holding just the brief, a phase system prompt that asks for a note of at most five lines, the normal tools, and a `log` that indents every line with `  │ `, and returns that note. Tell the lead to plan big jobs as phases. In `harness.ts`, run `lead(SYSTEM, TOOLS, log)` with the terminal's `log`.
+
+**Try:** "Two parts: find any bug in hello.ts, then count the lines in package.json. Use phases."
+
+**Why:** success compounds per step. At 99% a step, one 120-step loop finishes 29% of the time; phases with a retry finish about 85%. Fresh context per phase is also the cheapest context.
+
 ## 4: context
 
 **Changed:** a new `context.ts`: prompt caching and server compaction before 90k tokens (`CONTEXT`), tool results cut where they are made (`fit`), and the cost of every call printed (`cost`). `coding.ts` gets a stable `SYSTEM` prompt. `agent.ts` moves to `client.beta.messages.create` and spreads in `CONTEXT`.
